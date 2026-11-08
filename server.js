@@ -149,7 +149,8 @@ app.get('/api/status', (_req, res) => res.json({ success: true, status: 'online'
 app.get('/api/public-config', (_req, res) => res.json({
   releaseServerUrl: process.env.RELEASE_SERVER_URL || '',
   betaServerUrl: process.env.BETA_SERVER_URL || '',
-  noInviteReg: !!readSettings().noInviteReg
+  noInviteReg: !!readSettings().noInviteReg,
+  emailVerificationEnabled: readSettings().emailVerificationEnabled !== false
 }));
 
 app.post('/api/register/start', authLimiter, async (req, res) => {
@@ -171,12 +172,34 @@ app.post('/api/register/start', authLimiter, async (req, res) => {
     const invites = read('invites');
     if (!noInviteReg && !invites.some(i => i.code === code && !i.usedBy)) return res.status(400).json({ success: false, message: 'Invalid or already used invite code.' });
 
-    const verificationCode = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
     const salt = randomHex(16);
     const passwordHash = (await scrypt(password, salt, 64)).toString('hex');
+    const passwordRecord = { salt, hash: passwordHash };
+    const emailVerificationEnabled = readSettings().emailVerificationEnabled !== false;
+
+    // Admin may temporarily disable email verification. Registration still validates
+    // credentials/invites and creates the account server-side; no email is sent.
+    if (!emailVerificationEnabled) {
+      const user = { uid: crypto.randomUUID(), username, email, location: location.slice(0, 80), hwid: randomHex(16), password: passwordRecord, emailVerified: false, emailVerifiedAt: null, createdAt: Date.now() };
+      if (!noInviteReg) {
+        const invitesNow = read('invites');
+        const inviteIndex = invitesNow.findIndex(invite => invite.code === code && !invite.usedBy);
+        if (inviteIndex < 0) return res.status(400).json({ success: false, message: 'Invite is no longer valid. Start registration again.' });
+        invitesNow[inviteIndex].usedBy = user.uid;
+        invitesNow[inviteIndex].usedAt = Date.now();
+        write('invites', invitesNow);
+      }
+      const latestUsers = read('users');
+      if (latestUsers.some(u => u.username.toLowerCase() === username.toLowerCase() || u.email === email)) return res.status(409).json({ success: false, message: 'Username or email is already registered.' });
+      latestUsers.push(user); write('users', latestUsers);
+      setSession(res, user);
+      return res.status(201).json({ success: true, user: safeUser(user), emailVerificationRequired: false, message: 'Account created. Email verification is temporarily disabled.' });
+    }
+
+    const verificationCode = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
     const pending = read('pendingRegistrations').filter(item => item.expiresAt > Date.now() && item.email !== email);
     const verificationId = crypto.randomUUID();
-    pending.push({ verificationId, codeHash: sha(verificationCode), attempts: 0, username, email, location: location.slice(0, 80), password: { salt, hash: passwordHash }, inviteCode: noInviteReg ? null : code, createdAt: Date.now(), expiresAt: Date.now() + 10 * 60 * 1000 });
+    pending.push({ verificationId, codeHash: sha(verificationCode), attempts: 0, username, email, location: location.slice(0, 80), password: passwordRecord, inviteCode: noInviteReg ? null : code, createdAt: Date.now(), expiresAt: Date.now() + 10 * 60 * 1000 });
     write('pendingRegistrations', pending);
     try {
       await sendVerificationEmail(email, verificationCode);
@@ -184,7 +207,7 @@ app.post('/api/register/start', authLimiter, async (req, res) => {
       write('pendingRegistrations', pending.filter(item => item.verificationId !== verificationId));
       return res.status(503).json({ success: false, message: mailError.message });
     }
-    res.status(202).json({ success: true, verificationId, message: 'Verification code sent. Check your email.' });
+    res.status(202).json({ success: true, verificationId, emailVerificationRequired: true, message: 'Verification code sent. Check your email.' });
   } catch (err) { console.error('[register start]', err); res.status(500).json({ success: false, message: 'Could not start registration.' }); }
 });
 
@@ -441,6 +464,16 @@ app.post('/api/admin/no-invite-registration', adminIpCheck, authLimiter, (req, r
     writeSettings(settings);
     res.json({ success: true, noInviteReg: settings.noInviteReg });
   } catch (err) { console.error('[admin no-invite registration]', err); res.status(500).json({ success: false, message: 'Could not update registration setting.' }); }
+});
+
+app.post('/api/admin/email-verification', adminIpCheck, authLimiter, (req, res) => {
+  try {
+    if (!passwordMatches(req.body?.password)) return res.status(401).json({ success: false, message: 'Incorrect admin password.' });
+    const settings = readSettings();
+    settings.emailVerificationEnabled = settings.emailVerificationEnabled === false;
+    writeSettings(settings);
+    res.json({ success: true, emailVerificationEnabled: settings.emailVerificationEnabled });
+  } catch (err) { console.error('[admin email verification]', err); res.status(500).json({ success: false, message: 'Could not update email verification setting.' }); }
 });
 
 app.post('/api/admin/console-invite', adminIpCheck, authLimiter, (req, res) => {
