@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0c0c0c">
+  <title>Wataszit — Portal & Invite System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Styles for 1:1 Skeet/Gamesense Visuals -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background-color: #0c0c0c;
+      overflow-x: hidden;
+      font-family: 'Verdana', Geneva, Tahoma, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      color: #cccccc;
+    }
+
+    body { min-height: 100vh; min-height: 100dvh; }
+
+
+    /* Floating Windows Wrapper */
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      gap: 15px;
+      padding: 24px;
+    }
+
+    /* Skeet Window Box */
+    .menu-window {
+      position: relative;
+      width: min(560px, calc(100vw - 36px));
+      min-height: min(390px, calc(100dvh - 36px));
+      max-height: min(520px, calc(100dvh - 36px));
+      overflow-y: auto;
+      overflow-x: hidden;
+      background-color: #141414;
+      background-image: repeating-conic-gradient(#1b1b1b 0% 25%, #121212 0% 50%);
+      background-size: 2px 2px;
+      border: 5px solid #282828;
+      box-shadow:
+        0 0 0 1px #444444,
+        0 0 0 2px #000000,
+        inset 0 0 0 1px #000000,
+        0 10px 30px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      cursor: default;
+      animation: menuFadeIn 0.2s ease-out;
+    }
+
+    @keyframes menuFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes rainbowFlow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    /* Top Animated Rainbow Line */
+    .rainbow-bar {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg,
+          #597ecf 0%,
+          #49b0aa 18%,
+          #5ca868 36%,
+          #bfa754 54%,
+          #b86256 72%,
+          #9d5eb3 88%,
+          #597ecf 100%);
+      background-size: 200% 100%;
+      animation: rainbowFlow 4s linear infinite;
+      box-shadow: 0 1px 0 #000000;
+      flex-shrink: 0;
+    }
+
+    .menu-content {
+      padding: 16px 19px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    /* Title Branding */
+    #brdtitle {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    #brdtitle h1 {
+      font-size: 1.8em;
+      font-weight: 400;
+      padding: 2px 0;
+      font-family: 'Raleway', Verdana, sans-serif;
+      color: #ffffff;
+      text-shadow: 1px 1px 0 #000000;
+      text-align: center;
+      line-height: 1.15;
+      cursor: default;
+    }
+
+    #brdtitle h1 .title-green {
+      color: #84ce22;
+    }
+
+    .menu-subtitle {
+      font-family: 'Verdana', Geneva, Tahoma, sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      color: #727272;
+      text-shadow: 1px 1px 0 #000000;
+      text-align: center;
+      margin-top: 1px;
+      letter-spacing: 0.4px;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      width: 100%;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #282828;
+      background: #0f0f0f;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 6px 0;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: #666666;
+      font-family: 'Verdana', sans-serif;
+      font-size: 9px;
+      font-weight: bold;
+      text-transform: lowercase;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-shadow: 1px 1px 0 #000000;
+    }
+
+    .tab-btn:hover {
+      color: #aaaaaa;
+    }
+
+    .tab-btn.active {
+      color: #84ce22;
+      border-bottom: 2px solid #84ce22;
+      background: #151515;
+    }
+
+    /* Forms & Inputs */
+    .menu-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .input-row .input-group {
+      flex: 1;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      width: 100%;
+    }
+
+    .input-label {
+      font-family: 'Verdana', Geneva, Tahoma, sans-serif;
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #929292;
+      text-shadow: 1px 1px 0 #000000;
+      letter-spacing: 0.2px;
+      text-transform: lowercase;
+    }
+
+    .menu-input {
+      width: 100%;
+      height: 22px;
+      background-color: #101010;
+      border: 1px solid #333333;
+      box-shadow: 0 0 0 1px #000000;
+      outline: none;
+      padding: 0 6px;
+      font-family: 'Verdana', Geneva, Tahoma, sans-serif;
+      font-size: 9.5px;
+      color: #dfdfdf;
+      text-shadow: 1px 1px 0 #000000;
+      user-select: text;
+      -webkit-user-select: text;
+      transition: border-color 0.1s ease;
+    }
+
+    .menu-input::placeholder {
+      color: #444444;
+    }
+
+    .menu-input:focus {
+      border-color: #557ec9;
+    }
+
+    .menu-input.input-error {
+      border-color: #e06c75 !important;
+    }
+
+    /* Skeet Button Styling */
+    .menu-btn {
+      margin-top: 4px;
+      width: 100%;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-family: 'Verdana', Geneva, Tahoma, sans-serif;
+      font-size: 10.5px;
+      font-weight: 400;
+      color: #cecece;
+      text-shadow: 1px 1px 0 #000000;
+      background: linear-gradient(180deg, #262626 0%, #1a1a1a 100%);
+      border: 1px solid #3a3a3a;
+      box-shadow: 0 0 0 1px #000000;
+      cursor: pointer;
+      outline: none;
+      transition: background 0.08s ease, border-color 0.08s ease, color 0.08s ease;
+    }
+
+    .menu-btn:hover {
+      background: linear-gradient(180deg, #333333 0%, #222222 100%);
+      border-color: #4d4d4d;
+      color: #ffffff;
+    }
+
+    .menu-btn:active {
+      background: linear-gradient(180deg, #181818 0%, #242424 100%);
+      border-color: #2b2b2b;
+      color: #999999;
+      box-shadow: 0 0 0 1px #000000, inset 0 1px 2px rgba(0, 0, 0, 0.6);
+    }
+
+    .menu-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Terminal Status Log Output */
+    .generator-status {
+      display: none;
+      width: 100%;
+      margin-top: 8px;
+      padding: 6px 8px;
+      background: #090909;
+      border: 1px solid #282828;
+      box-shadow: 0 0 0 1px #000000;
+      font-family: 'Verdana', Geneva, Tahoma, sans-serif;
+      font-size: 9px;
+      color: #89ddff;
+      text-align: left;
+      text-shadow: 1px 1px 0 #000000;
+      line-height: 1.4;
+      word-break: break-all;
+      min-height: 38px;
+    }
+
+    .generator-status.active {
+      display: block;
+      animation: fadeIn 0.15s ease-in;
+    }
+
+    .generator-status a {
+      color: #84ce22;
+      text-decoration: underline;
+      font-weight: 700;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Views */
+    .view-section {
+      display: none;
+      width: 100%;
+    }
+
+    .view-section.active {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    /* Dashboard Info Panel */
+    .dashboard-panel {
+      background: #0a0a0a;
+      border: 1px solid #242424;
+      box-shadow: inset 0 0 0 1px #000000;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .dash-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 8.5px;
+      color: #777777;
+      border-bottom: 1px solid #161616;
+      padding-bottom: 3px;
+    }
+
+    .dash-row span:last-child {
+      color: #cccccc;
+      font-weight: bold;
+    }
+
+    .dash-row span.green-text {
+      color: #84ce22 !important;
+    }
+
+    /* Email Notification Box */
+    .email-box {
+      background: #0f180c;
+      border: 1px solid #264219;
+      padding: 6px 8px;
+      font-size: 8.5px;
+      color: #a4e05c;
+      margin-top: 4px;
+      line-height: 1.3;
+      border-radius: 1px;
+    }
+
+    /* Footer Links */
+    .menu-footer-links {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-top: 10px;
+    }
+
+    .footer-link {
+      font-family: 'Verdana', Geneva, Tahoma, sans-serif;
+      font-size: 8.5px;
+      font-weight: 400;
+      color: #666666;
+      text-decoration: none;
+      text-shadow: 1px 1px 0 #000000;
+      transition: color 0.1s;
+    }
+
+    .footer-link:hover {
+      color: #84ce22;
+      text-decoration: underline;
+    }
+
+    .code-pill {
+      font-family: monospace;
+      background: #1a1a1a;
+      color: #89ddff;
+      padding: 1px 4px;
+      border: 1px solid #333;
+      font-size: 8px;
+    }
+    #betaJoinBtn {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      margin: 7px auto 0;
+      width: min(150px, 100%);
+      min-height: 27px;
+      padding: 5px 12px;
+      font-size: 9px;
+      color: #101010;
+      background: linear-gradient(180deg, #a8ec45 0%, #6da91b 100%);
+      border-color: #84ce22;
+      font-weight: 700;
+      text-shadow: none;
+      text-decoration: none;
+    }
+    #betaJoinBtn:hover { background: linear-gradient(180deg, #c1ff68 0%, #84ce22 100%); color: #050505; }
+    @media (max-width: 600px) {
+      .app-container { padding: 10px; justify-content: flex-start; }
+      .menu-window { width: calc(100vw - 20px); min-height: min(350px, calc(100dvh - 20px)); max-height: calc(100dvh - 20px); }
+      .menu-content { padding: 14px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-container">
+    <div class="menu-window" id="menuWindow">
+      <!-- Top Rainbow Accent Line -->
+      <div class="rainbow-bar"></div>
+
+      <div class="menu-content">
+        <!-- Title & Subtitle -->
+        <div id="brdtitle">
+          <h1>wata<span class="title-green">szit</span></h1>
+          <div class="menu-subtitle" id="subTitle">portal & invite system</div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+          <button class="tab-btn active" data-tab="register" onclick="switchTab('register')">Register</button>
+          <button class="tab-btn" data-tab="login" onclick="switchTab('login')">Login</button>
+          <button class="tab-btn" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
+          <button class="tab-btn" data-tab="keycheck" onclick="switchTab('keycheck')">Key Check</button>
+        </div>
+
+        <!-- TAB 1: REGISTRATION VIEW -->
+        <div class="view-section active" id="registerView">
+          <form class="menu-form" id="registerForm" onsubmit="return false;">
+            <div class="input-group">
+              <label class="input-label" for="regCode" id="regCodeLabel">invite code <span style="color:#e06c75;">*</span></label>
+              <input type="text" class="menu-input" id="regCode" placeholder="WAT-INIT-2026" autocomplete="off" required>
+            </div>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label class="input-label" for="regUser">username</label>
+                <input type="text" class="menu-input" id="regUser" placeholder="e.g. user99" autocomplete="off" required>
+              </div>
+              <div class="input-group">
+                <label class="input-label" for="regEmail">email address</label>
+                <input type="email" class="menu-input" id="regEmail" placeholder="user@domain.com" autocomplete="off" required>
+              </div>
+            </div>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label class="input-label" for="regPass">password</label>
+                <input type="password" class="menu-input" id="regPass" placeholder="••••••••" autocomplete="off" required>
+              </div>
+              <div class="input-group">
+                <label class="input-label" for="regLoc">location</label>
+                <input type="text" class="menu-input" id="regLoc" placeholder="warsaw, poland" autocomplete="off" required>
+              </div>
+            </div>
+
+            <button type="submit" class="menu-btn" id="regBtn">register account</button>
+          </form>
+
+          <form class="menu-form" id="verifyEmailForm" style="display:none; margin-top:10px;" onsubmit="return false;">
+            <div class="input-group">
+              <label class="input-label" for="emailVerifyCode">email verification code</label>
+              <input type="text" class="menu-input" id="emailVerifyCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" required>
+              <div style="font-size:8px;color:#888;margin-top:5px;line-height:1.45;">A 6-digit code was sent to your email. It expires in 10 minutes.</div>
+            </div>
+            <button type="submit" class="menu-btn" id="verifyEmailBtn">verify email & create account</button>
+            <button type="button" class="menu-btn" id="resendEmailCodeBtn" style="margin-top:5px;">resend code</button>
+            <button type="button" class="menu-btn" id="restartRegisterBtn" style="margin-top:5px;">back to registration</button>
+          </form>
+
+          <div class="menu-footer-links" id="registerFooterLinks">
+            <a href="https://discord.gg/eAzTCfbx4T" target="_blank" rel="noopener noreferrer" class="footer-link">
+              no invite? get one on discord ↗
+            </a>
+          </div>
+        </div>
+
+        <div class="view-section" id="loginView">
+          <form class="menu-form" id="loginForm">
+            <div class="input-group"><label class="input-label" for="loginIdentity">username or email</label><input class="menu-input" id="loginIdentity" autocomplete="username" required></div>
+            <div class="input-group"><label class="input-label" for="loginPassword">password</label><input class="menu-input" id="loginPassword" type="password" autocomplete="current-password" required></div>
+            <button class="menu-btn" id="loginBtn" type="submit">login</button>
+          </form>
+        </div>
+        <!-- TAB 2: USER DASHBOARD & GENERATOR VIEW -->
+        <div class="view-section" id="dashboardView">
+          <div id="noAuthNotice" style="font-size: 9px; color: #777; text-align: center; padding: 15px 0;">
+            [!] Please register with a valid invite code first to access your user dashboard.
+          </div>
+
+          <div id="authDashboard" style="display: none; width: 100%; flex-direction: column; gap: 7px;">
+            <div class="dashboard-panel">
+              <div class="dash-row">
+                <span>server status</span>
+                <span class="green-text">VERIFIED</span>
+              </div>
+              <div class="dash-row">
+                <span>assigned uid</span>
+                <span class="green-text" id="dashUid">#1001</span>
+              </div>
+              <div class="dash-row">
+                <span>username</span>
+                <span id="dashUser">-</span>
+              </div>
+              <div class="dash-row">
+                <span>bound email</span>
+                <span id="dashEmail">-</span>
+              </div>
+              <div class="dash-row">
+                <span>registered location</span>
+                <span id="dashLoc">-</span>
+              </div>
+              <div class="dash-row" style="border: none;">
+                <span>hwid signature</span>
+                <span style="color: #89ddff;" id="dashHwid">OK_SECURE</span>
+              </div>
+            </div>
+
+            <button type="button" class="menu-btn" id="logoutBtn">logout</button>
+            <div class="email-box" id="emailNotification">✉ Email address verified</div>
+
+            <form class="menu-form" id="inviteForm" onsubmit="return false;" style="margin-top: 4px;">
+              <button type="submit" class="menu-btn" id="generateBtn">generate invite</button>
+            </form>
+
+            <div class="dashboard-panel" id="serverAccessPanel" style="margin-top: 8px;">
+              <a id="betaServerLink" href="#" target="_blank" rel="noopener noreferrer" style="display: none;" aria-hidden="true" tabindex="-1"></a>
+              <a id="releaseJoinBtn" class="menu-btn" href="#" target="_blank" rel="noopener noreferrer" style="display:none; margin:7px auto 0; width:min(150px,100%); min-height:27px; padding:5px 12px; font-size:9px; text-align:center; text-decoration:none;">Join Release</a>
+              <button type="button" class="menu-btn" id="betaApplyBtn" style="margin-top: 8px;">Apply for beta</button>
+              <div id="betaApplyNotice" style="font-size: 8.5px; color: #888; line-height: 1.45; margin-top: 6px;">
+                Apply for access to the Wataszit beta server. The Join button appears after approval.
+              </div>
+              <div id="betaApplyStatus" style="font-size: 9px; margin-top: 7px; color: #89ddff;"></div>
+              <a id="betaJoinBtn" class="menu-btn" href="#" target="_blank" rel="noopener noreferrer">Join</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: KEY CHECKER / SYSTEM UTILITY -->
+        <div class="view-section" id="keycheckView">
+          <form class="menu-form" id="checkForm" onsubmit="return false;">
+            <div class="input-group">
+              <label class="input-label" for="checkCode">check invite key status</label>
+              <input type="text" class="menu-input" id="checkCode" placeholder="WAT-INIT-2026" autocomplete="off">
+            </div>
+            <button type="submit" class="menu-btn" id="checkBtn">verify key</button>
+          </form>
+
+          <div style="margin-top: 10px; font-size: 8.5px; color: #666; line-height: 1.4;">
+            <div>Sample valid server keys:</div>
+            <div style="margin-top: 3px; display: flex; flex-wrap: wrap; gap: 4px;">
+              <span class="code-pill">WAT-INIT-2026</span>
+              <span class="code-pill">SZIT-777-ALPHA</span>
+              <span class="code-pill">GAMESENSE-888</span>
+              <span class="code-pill">WINTER-REFRESH</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SHARED TYPEWRITER / STATUS TERMINAL -->
+        <div class="generator-status" id="genStatus"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Simulated Backend Script & UI Logic -->
+ <script>
+/* =========================================================
+   WATASZIT — FRONTEND / NODE.JS BACKEND CONNECTION
+   No localStorage database.
+   ========================================================= */
+
+/* DOM ELEMENTS */
+const genStatus = document.getElementById('genStatus');
+
+const registerForm = document.getElementById('registerForm');
+const inviteForm = document.getElementById('inviteForm');
+const checkForm = document.getElementById('checkForm');
+
+const regCode = document.getElementById('regCode');
+const regUser = document.getElementById('regUser');
+const regEmail = document.getElementById('regEmail');
+const regPass = document.getElementById('regPass');
+const regLoc = document.getElementById('regLoc');
+
+const regBtn = document.getElementById('regBtn');
+const verifyEmailForm = document.getElementById('verifyEmailForm');
+const verifyEmailCode = document.getElementById('emailVerifyCode');
+const verifyEmailBtn = document.getElementById('verifyEmailBtn');
+const registerFooterLinks = document.getElementById('registerFooterLinks');
+let pendingVerificationId = null;
+const generateBtn = document.getElementById('generateBtn');
+const checkBtn = document.getElementById('checkBtn');
+
+const checkCode = document.getElementById('checkCode');
+
+const noAuthNotice = document.getElementById('noAuthNotice');
+const authDashboard = document.getElementById('authDashboard');
+
+let currentUser = null;
+let isProcessing = false;
+
+
+/* =========================================================
+   API REQUEST HELPER
+   ========================================================= */
+
+async function apiRequest(endpoint, options = {}) {
+    const response = await fetch(endpoint, {
+        ...options,
+        credentials: 'same-origin',
+        headers: {
+            ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+            ...(options.headers || {})
+        }
+    });
+
+    let result;
+
+    try {
+        result = await response.json();
+    } catch {
+        throw new Error('Invalid response from server.');
+    }
+
+    if (!response.ok) {
+        throw new Error(result.message || result.error || 'Server request failed.');
+    }
+
+    return result;
+}
+
+
+/* =========================================================
+   STATUS / TYPEWRITER
+   ========================================================= */
+
+function showStatus(message, color = '#89ddff') {
+    genStatus.classList.add('active');
+    genStatus.style.color = color;
+    genStatus.textContent = message;
+}
+
+function hideStatus() {
+    genStatus.classList.remove('active');
+    genStatus.textContent = '';
+}
+
+function typeWriterEffect(text, htmlAppend = '', color = '#89ddff', callback) {
+    genStatus.classList.add('active');
+    genStatus.style.color = color;
+    genStatus.textContent = '';
+
+    let i = 0;
+
+    function typing() {
+        if (i < text.length) {
+            genStatus.textContent += text.charAt(i);
+            i++;
+            setTimeout(typing, 18);
+            return;
+        }
+
+        // Only use this for trusted, hardcoded HTML.
+        if (htmlAppend) {
+            genStatus.insertAdjacentHTML('beforeend', htmlAppend);
+        }
+
+        if (callback) callback();
+    }
+
+    typing();
+}
+
+
+/* =========================================================
+   TAB SWITCHING
+   ========================================================= */
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.classList.remove('active');
+    });
+
+    document.querySelectorAll('.view-section').forEach(section => {
+        section.classList.remove('active');
+    });
+
+    const activeButton = document.querySelector(
+        `.tab-btn[data-tab="${tabName}"]`
+    );
+
+    const targetView = document.getElementById(tabName + 'View');
+
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+
+    if (targetView) {
+        targetView.classList.add('active');
+    }
+
+    if (tabName === 'dashboard') {
+        renderDashboard();
+    }
+}
+
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+
+function renderDashboard() {
+    if (!currentUser) {
+        noAuthNotice.style.display = 'block';
+        authDashboard.style.display = 'none';
+        return;
+    }
+
+    noAuthNotice.style.display = 'none';
+    authDashboard.style.display = 'flex';
+        loadServerLinks();
+        loadBetaApplicationStatus();
+
+    document.getElementById('dashUid').textContent =
+        '#' + currentUser.uid;
+
+    document.getElementById('dashUser').textContent =
+        currentUser.username;
+
+    document.getElementById('dashEmail').textContent =
+        currentUser.email;
+
+    document.getElementById('dashLoc').textContent =
+        currentUser.location;
+
+    document.getElementById('dashHwid').textContent =
+        currentUser.hwid || 'OK_SECURE';
+
+    const emailNotice = document.getElementById('emailNotification');
+    if (emailNotice) emailNotice.textContent = currentUser.emailVerified ? '✉ Email address verified' : '✉ Legacy account — email was not verified during registration';
+}
+
+
+/* =========================================================
+   LOAD AUTHENTICATED USER FROM SERVER
+   ========================================================= */
+
+async function loadCurrentUser() {
+    try {
+        const result = await apiRequest('/api/me');
+
+        currentUser = result.user || null;
+
+        renderDashboard();
+    } catch {
+        currentUser = null;
+        renderDashboard();
+    }
+}
+
+
+/* =========================================================
+   1. REGISTRATION
+   ========================================================= */
+
+registerForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (regBtn.disabled) return;
+    const payload = {
+      code: regCode.value.trim().toUpperCase(),
+      username: regUser.value.trim(),
+      email: regEmail.value.trim(),
+      password: regPass.value,
+      location: regLoc.value.trim()
+    };
+    if ((!window.wataszitNoInviteReg && !payload.code) || !payload.username || !payload.email || !payload.password || !payload.location) {
+      showStatus('[error] please fill in all fields.', '#e06c75'); return;
+    }
+    regBtn.disabled = true;
+    showStatus('sending email verification code...', '#89ddff');
+    try {
+      const result = await apiRequest('/api/register/start', { method: 'POST', body: JSON.stringify(payload) });
+      pendingVerificationId = result.verificationId;
+      registerForm.style.display = 'none';
+      registerFooterLinks.style.display = 'none';
+      verifyEmailForm.style.display = 'flex';
+      verifyEmailCode.focus();
+      showStatus('verification code sent to ' + payload.email + '.', '#84ce22');
+    } catch (error) {
+      showStatus('[error] ' + error.message, '#e06c75');
+    } finally { regBtn.disabled = false; }
+});
+
+verifyEmailForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!pendingVerificationId || verifyEmailBtn.disabled) return;
+  verifyEmailBtn.disabled = true;
+  showStatus('verifying email code...', '#89ddff');
+  try {
+    const result = await apiRequest('/api/register/verify', { method: 'POST', body: JSON.stringify({ verificationId: pendingVerificationId, code: verifyEmailCode.value.trim() }) });
+    if (!result.user) throw new Error('Server did not return user information.');
+    currentUser = result.user;
+    pendingVerificationId = null;
+    registerForm.reset(); verifyEmailForm.reset();
+    registerForm.style.display = 'flex'; verifyEmailForm.style.display = 'none'; registerFooterLinks.style.display = '';
+    renderDashboard(); switchTab('dashboard');
+    showStatus('email verified. account created successfully.', '#84ce22');
+  } catch (error) { showStatus('[error] ' + error.message, '#e06c75'); }
+  finally { verifyEmailBtn.disabled = false; }
+});
+
+document.getElementById('resendEmailCodeBtn').addEventListener('click', async () => {
+  const button = document.getElementById('resendEmailCodeBtn');
+  if (!pendingVerificationId || button.disabled) return;
+  button.disabled = true;
+  try {
+    await apiRequest('/api/register/resend', { method: 'POST', body: JSON.stringify({ verificationId: pendingVerificationId }) });
+    showStatus('a new verification code was sent to your email.', '#84ce22');
+  } catch (error) { showStatus('[error] ' + error.message, '#e06c75'); }
+  finally { button.disabled = false; }
+});
+
+document.getElementById('restartRegisterBtn').addEventListener('click', () => {
+  pendingVerificationId = null;
+  verifyEmailForm.reset(); verifyEmailForm.style.display = 'none';
+  registerForm.style.display = 'flex'; registerFooterLinks.style.display = '';
+  showStatus('registration restarted. submit the form to receive a new code.', '#89ddff');
+});
+
+
+/* =========================================================
+   2. DASHBOARD / INVITE GENERATOR
+   ========================================================= */
+
+inviteForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    if (isProcessing) return;
+
+    isProcessing = true;
+    generateBtn.disabled = true;
+
+    try {
+        if (!currentUser) {
+            await loadCurrentUser();
+        }
+
+        if (!currentUser) {
+            throw new Error('You must be logged in to generate invites.');
+        }
+
+        typeWriterEffect(
+            'connecting to wataszit backend cluster...',
+            '',
+            '#89ddff',
+            async () => {
+                try {
+                    const result = await apiRequest('/api/invites/generate', {
+                        method: 'POST',
+                        body: JSON.stringify({})
+                    });
+
+                    const inviteCode =
+                        result.code ||
+                        result.inviteCode ||
+                        result.invite?.code;
+
+                    if (!inviteCode) {
+                        throw new Error('Server did not return an invite code.');
+                    }
+
+                    typeWriterEffect(
+                        'success! invite code generated: ',
+                        '',
+                        '#84ce22',
+                        () => {
+                            const codeElement = document.createElement('span');
+
+                            codeElement.textContent = inviteCode;
+                            codeElement.style.display = 'block';
+                            codeElement.style.marginTop = '5px';
+                            codeElement.style.color = '#89ddff';
+                            codeElement.style.fontWeight = 'bold';
+
+                            genStatus.appendChild(codeElement);
+
+                            const copyButton = document.createElement('button');
+
+                            copyButton.type = 'button';
+                            copyButton.className = 'menu-btn';
+                            copyButton.style.marginTop = '7px';
+                            copyButton.textContent = 'copy invite code';
+
+                            copyButton.addEventListener('click', async () => {
+                                try {
+                                    await navigator.clipboard.writeText(inviteCode);
+                                    copyButton.textContent = 'copied!';
+                                } catch {
+                                    showStatus(
+                                        'could not copy invite code.',
+                                        '#e06c75'
+                                    );
+                                }
+                            });
+
+                            genStatus.appendChild(copyButton);
+                        }
+                    );
+
+                } catch (error) {
+                    showStatus('[error] ' + error.message, '#e06c75');
+                } finally {
+                    isProcessing = false;
+                    generateBtn.disabled = false;
+                }
+            }
+        );
+
+    } catch (error) {
+        showStatus('[error] ' + error.message, '#e06c75');
+        isProcessing = false;
+        generateBtn.disabled = false;
+    }
+});
+
+
+/* =========================================================
+   3. INVITE KEY CHECKER
+   ========================================================= */
+
+checkForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    if (checkBtn.disabled) return;
+
+    const code = checkCode.value.trim().toUpperCase();
+
+    if (!code) {
+        showStatus('[error] enter an invite key first.', '#e06c75');
+        return;
+    }
+
+    checkBtn.disabled = true;
+
+    showStatus('checking key with server...', '#89ddff');
+
+    try {
+        const result = await apiRequest('/api/invites/check', {
+            method: 'POST',
+            body: JSON.stringify({ code })
+        });
+
+        if (result.valid === true || result.success === true) {
+            typeWriterEffect(
+                `key [${code}] is VALID and ready for registration.`,
+                '',
+                '#84ce22'
+            );
+        } else {
+            typeWriterEffect(
+                `key [${code}] is INVALID or already used.`,
+                '',
+                '#e06c75'
+            );
+        }
+
+    } catch (error) {
+        showStatus('[error] ' + error.message, '#e06c75');
+
+    } finally {
+        checkBtn.disabled = false;
+    }
+});
+
+
+/* =========================================================
+   PRIVATE CONSOLE INVITE COMMAND
+   DevTools command: genInvite()
+   The password is checked by the server, not stored in this file.
+   ========================================================= */
+
+async function loadServerLinks() {
+    try {
+        const config = await apiRequest('/api/public-config');
+        window.wataszitNoInviteReg = !!config.noInviteReg;
+        const codeInput = document.getElementById('regCode');
+        const codeLabel = document.getElementById('regCodeLabel');
+        codeInput.required = !config.noInviteReg;
+        codeInput.disabled = !!config.noInviteReg;
+        codeInput.placeholder = config.noInviteReg ? 'Invite code not required' : 'WAT-INIT-2026';
+        codeLabel.innerHTML = config.noInviteReg ? 'invite code <span style="color:#84ce22;">(optional)</span>' : 'invite code <span style="color:#e06c75;">*</span>';
+        const release = document.getElementById('releaseJoinBtn');
+        if (config.releaseServerUrl) { release.href = config.releaseServerUrl; release.style.display = 'flex'; }
+        else { release.style.display = 'none'; release.removeAttribute('href'); }
+        const beta = document.getElementById('betaServerLink');
+        if (config.betaServerUrl) beta.href = config.betaServerUrl;
+        else { beta.removeAttribute('href'); beta.textContent = 'not configured'; }
+    } catch (error) {
+        console.warn('[Wataszit] Could not load server links:', error.message);
+    }
+}
+
+async function loadBetaApplicationStatus() {
+    const status = document.getElementById('betaApplyStatus');
+    if (!currentUser || !status) return;
+    try {
+        const result = await apiRequest('/api/beta-application/status');
+        const state = result.application?.status || 'none';
+        const applyButton = document.getElementById('betaApplyBtn');
+        const joinButton = document.getElementById('betaJoinBtn');
+        const betaLink = document.getElementById('betaServerLink');
+        const approved = state === 'accepted';
+
+        status.textContent = state === 'pending' ? 'Your beta application is pending review.' :
+            approved ? 'Your beta application was accepted.' :
+            state === 'declined' ? 'Your beta application was declined.' : '';
+        status.style.color = approved ? '#84ce22' : state === 'declined' ? '#e06c75' : '#89ddff';
+        applyButton.style.display = approved ? 'none' : 'block';
+        applyButton.disabled = state === 'pending';
+        applyButton.textContent = state === 'pending' ? 'Application pending' : 'Apply for beta';
+        document.getElementById('betaApplyNotice').style.display = approved ? 'none' : 'block';
+
+        const betaHref = betaLink?.getAttribute('href');
+        if (approved && betaHref && betaHref !== '#') {
+            joinButton.href = betaHref;
+            joinButton.style.display = 'flex';
+        } else {
+            joinButton.style.display = 'none';
+            joinButton.removeAttribute('href');
+        }
+    } catch (error) {
+        if (!error.message.includes('not found')) console.warn('[Wataszit] Beta status:', error.message);
+    }
+}
+
+document.getElementById('betaApplyBtn')?.addEventListener('click', async () => {
+    const button = document.getElementById('betaApplyBtn');
+    const status = document.getElementById('betaApplyStatus');
+    if (!currentUser) { status.textContent = 'Please log in first.'; return; }
+    if (!window.confirm('Apply for beta access? Your account name and IP address will be sent to the Wataszit beta review team.')) return;
+    button.disabled = true;
+    status.textContent = 'Submitting beta application...';
+    try {
+        await apiRequest('/api/beta-application', { method: 'POST', body: JSON.stringify({}) });
+        status.textContent = 'Application sent. Waiting for review.';
+        await loadBetaApplicationStatus();
+    } catch (error) {
+        status.textContent = '[error] ' + error.message;
+        button.disabled = false;
+    }
+});
+
+window.genInvite = async function () {
+    const password = window.prompt('Wataszit admin password:');
+
+    if (password === null) return;
+
+    if (!password) {
+        console.error('[Wataszit] Password is required.');
+        return;
+    }
+
+    try {
+        console.info('[Wataszit] Requesting invite...');
+
+        const result = await apiRequest('/api/admin/console-invite', {
+            method: 'POST',
+            body: JSON.stringify({ password })
+        });
+
+        const inviteCode = result.code || result.inviteCode || result.invite?.code;
+
+        if (!inviteCode) {
+            throw new Error('Server did not return an invite code.');
+        }
+
+        console.log('%c[Wataszit] Invite generated:', 'color:#84ce22;font-weight:bold;');
+        console.log('%c' + inviteCode, 'color:#89ddff;font-size:16px;font-weight:bold;');
+
+        try {
+            await navigator.clipboard.writeText(inviteCode);
+            console.info('[Wataszit] Invite copied to clipboard.');
+        } catch {
+            console.info('[Wataszit] Clipboard unavailable; copy the code above.');
+        }
+
+        return inviteCode;
+    } catch (error) {
+        console.error('[Wataszit] ' + (error.message || 'Invite generation failed.'));
+    }
+};
+
+window.NOINVITEREG = async function () {
+    const password = window.prompt('Wataszit admin password:');
+    if (password === null) return;
+    if (!password) { console.error('[Wataszit] Admin password is required.'); return; }
+    try {
+        const result = await apiRequest('/api/admin/no-invite-registration', { method: 'POST', body: JSON.stringify({ password }) });
+        window.wataszitNoInviteReg = !!result.noInviteReg;
+        await loadServerLinks();
+        console.info('%c[Wataszit] Registration without invite: ' + (result.noInviteReg ? 'ENABLED' : 'DISABLED'), 'color:#84ce22;font-weight:bold;');
+        return result.noInviteReg;
+    } catch (error) { console.error('[Wataszit] ' + (error.message || 'Could not change registration mode.')); }
+};
+
+window.noinvitereg = window.NOINVITEREG; // lowercase alias; JavaScript names are case-sensitive
+console.info('[Wataszit] Admin console commands ready: genInvite(), NOINVITEREG() (also noinvitereg()).');
+loadServerLinks();
+
+
+const loginForm = document.getElementById('loginForm');
+loginForm?.addEventListener('submit', async event => {
+  event.preventDefault();
+  const button = document.getElementById('loginBtn'); button.disabled = true;
+  try {
+    const result = await apiRequest('/api/login', { method:'POST', body:JSON.stringify({
+      login:document.getElementById('loginIdentity').value.trim(),
+      password:document.getElementById('loginPassword').value
+    })});
+    currentUser=result.user; loginForm.reset(); renderDashboard(); switchTab('dashboard');
+    showStatus('login successful.','#84ce22');
+  } catch(error) { showStatus('[error] '+error.message,'#e06c75'); }
+  finally { button.disabled=false; }
+});
+document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+  try { await apiRequest('/api/logout',{method:'POST',body:JSON.stringify({})}); }
+  finally { currentUser=null; renderDashboard(); switchTab('login'); }
+});
+async function refreshBetaStatus() {
+  if (currentUser) await loadBetaApplicationStatus();
+}
+
+/* =========================================================
+   4. INITIALIZATION
+   ========================================================= */
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadCurrentUser();
+});
+
+// Also run immediately because this script is at the end of body.
+loadCurrentUser();
+setInterval(()=>{ if(currentUser) refreshBetaStatus(); },3000);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+[
+  {
+    "uid": "d5447e4b-c96d-4569-8127-f72806a8b40f",
+    "username": "cw3lordxf",
+    "email": "lizmejajakdssa@gmail.com",
+    "location": "poland",
+    "hwid": "af8c0f50f37cb44dd18e5a839fe7427b",
+    "password": {
+      "salt": "9728992e28532670e0aa9ad7940de5c8",
+      "hash": "58afe2fe89196c8c83d9fa70ea418fe7c4ab11002e43d6cdce9038de3da737e512794777064bec9ba7f4ea13155ea614d5cdadcbc67e6f10085d8774b8e16e1e"
+    },
+    "createdAt": 1794175418368
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "code": "WATASZIT-52C36EB01E5F",
+    "createdBy": "admin-console",
+    "createdAt": 1794175416054,
+    "usedBy": "d5447e4b-c96d-4569-8127-f72806a8b40f",
+    "usedAt": 1794175418368
+  },
+  {
+    "code": "WATASZIT-A761ADAF798E",
+    "createdBy": "d5447e4b-c96d-4569-8127-f72806a8b40f",
+    "createdAt": 1794176329148,
+    "usedBy": null,
+    "usedAt": null
+  }
+]
