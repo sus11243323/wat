@@ -811,12 +811,20 @@ registerForm.addEventListener('submit', async (event) => {
     showStatus('sending email verification code...', '#89ddff');
     try {
       const result = await apiRequest('/api/register/start', { method: 'POST', body: JSON.stringify(payload) });
-      pendingVerificationId = result.verificationId;
-      registerForm.style.display = 'none';
-      registerFooterLinks.style.display = 'none';
-      verifyEmailForm.style.display = 'flex';
-      verifyEmailCode.focus();
-      showStatus('verification code sent to ' + payload.email + '.', '#84ce22');
+      if (result.user) {
+        currentUser = result.user;
+        pendingVerificationId = null;
+        registerForm.reset();
+        renderDashboard(); switchTab('dashboard');
+        showStatus('account created. email verification is temporarily disabled.', '#84ce22');
+      } else {
+        pendingVerificationId = result.verificationId;
+        registerForm.style.display = 'none';
+        registerFooterLinks.style.display = 'none';
+        verifyEmailForm.style.display = 'flex';
+        verifyEmailCode.focus();
+        showStatus('verification code sent to ' + payload.email + '.', '#84ce22');
+      }
     } catch (error) {
       showStatus('[error] ' + error.message, '#e06c75');
     } finally { regBtn.disabled = false; }
@@ -1014,6 +1022,7 @@ async function loadServerLinks() {
     try {
         const config = await apiRequest('/api/public-config');
         window.wataszitNoInviteReg = !!config.noInviteReg;
+        window.wataszitEmailVerificationEnabled = config.emailVerificationEnabled !== false;
         const codeInput = document.getElementById('regCode');
         const codeLabel = document.getElementById('regCodeLabel');
         codeInput.required = !config.noInviteReg;
@@ -1135,7 +1144,22 @@ window.NOINVITEREG = async function () {
 };
 
 window.noinvitereg = window.NOINVITEREG; // lowercase alias; JavaScript names are case-sensitive
-console.info('[Wataszit] Admin console commands ready: genInvite(), NOINVITEREG() (also noinvitereg()).');
+
+// Admin-only toggle: temporarily bypass or restore email verification at registration.
+window.NOEMAILVERIFY = async function () {
+    const password = window.prompt('Wataszit admin password:');
+    if (password === null) return;
+    if (!password) { console.error('[Wataszit] Admin password is required.'); return; }
+    try {
+        const result = await apiRequest('/api/admin/email-verification', { method: 'POST', body: JSON.stringify({ password }) });
+        window.wataszitEmailVerificationEnabled = !!result.emailVerificationEnabled;
+        console.info('%c[Wataszit] Email verification: ' + (result.emailVerificationEnabled ? 'ENABLED' : 'TEMPORARILY DISABLED'), 'color:#84ce22;font-weight:bold;');
+        console.info('[Wataszit] New registrations ' + (result.emailVerificationEnabled ? 'must verify their email.' : 'will not receive a verification code.'));
+        return result.emailVerificationEnabled;
+    } catch (error) { console.error('[Wataszit] ' + (error.message || 'Could not change email verification setting.')); }
+};
+window.noemailverify = window.NOEMAILVERIFY;
+console.info('[Wataszit] Admin console commands ready: genInvite(), NOINVITEREG(), NOEMAILVERIFY().');
 loadServerLinks();
 
 
