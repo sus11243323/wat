@@ -90,12 +90,8 @@ body {
     height: 2px;
     flex-shrink: 0;
     background: linear-gradient(90deg,
-        #597ecf 0%,
-        #49b0aa 18%,
-        #5ca868 36%,
-        #bfa754 54%,
-        #b86256 72%,
-        #9d5eb3 88%,
+        #597ecf 0%, #49b0aa 18%, #5ca868 36%,
+        #bfa754 54%, #b86256 72%, #9d5eb3 88%,
         #597ecf 100%);
     background-size: 200% 100%;
     animation: rainbowFlow 4s linear infinite;
@@ -111,10 +107,39 @@ body {
     min-width: 0;
 }
 
+/* KRULIK LOGO */
 #brdtitle {
     width: 100%;
     text-align: center;
     margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.brand-logo {
+    width: clamp(76px, 19vw, 112px);
+    height: clamp(76px, 19vw, 112px);
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #84ce22;
+    box-shadow:
+        0 0 0 3px #171717,
+        0 0 18px rgba(132, 206, 34, .22),
+        0 5px 15px rgba(0,0,0,.7);
+    margin-bottom: 12px;
+    animation: logoAppear .55s ease-out;
+}
+
+@keyframes logoAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(.92);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 #brdtitle h1 {
@@ -451,7 +476,6 @@ body {
 }
 
 /* DISCORD SERVER MONITOR */
-
 .discord-monitor {
     width: 100%;
     display: flex;
@@ -548,8 +572,7 @@ body {
     overflow-wrap: anywhere;
 }
 
-/* RESPONSIVE LAYOUT */
-
+/* RESPONSIVE */
 @media (max-width: 600px) {
     .app-container {
         padding: 10px;
@@ -590,7 +613,6 @@ body {
     .app-container { padding: 6px; }
     .menu-window { border-width: 3px; }
     .menu-content { padding: 10px; }
-
     .input-row { flex-direction: column; }
 
     .tab-btn {
@@ -599,8 +621,12 @@ body {
     }
 
     #brdtitle h1 { font-size: 1.35rem; }
-
     .extra-tools { flex-direction: column; }
+
+    .brand-logo {
+        width: 76px;
+        height: 76px;
+    }
 }
 
 @media (min-width: 601px) and (max-width: 900px) {
@@ -629,6 +655,12 @@ body {
         min-height: 0;
         max-height: calc(100dvh - 16px);
     }
+
+    .brand-logo {
+        width: 58px;
+        height: 58px;
+        margin-bottom: 7px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -651,6 +683,13 @@ body {
 <div class="menu-content">
 
 <div id="brdtitle">
+    <img
+        src="/krulik.jpg"
+        alt="Wataszit mascot"
+        class="brand-logo"
+        width="112"
+        height="112"
+    >
     <h1>wata<span class="title-green">szit:Refreshed</span></h1>
     <div class="menu-subtitle" id="subTitle">wataszit server</div>
 </div>
@@ -973,10 +1012,7 @@ let isProcessing = false;
 let dashboardLoading = false;
 let lastDashboardRefresh = 0;
 
-/* =========================================================
-   API HELPER
-   ========================================================= */
-
+/* API HELPER */
 async function apiRequest(endpoint, options = {}) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
@@ -1028,10 +1064,7 @@ async function apiRequest(endpoint, options = {}) {
     }
 }
 
-/* =========================================================
-   STATUS
-   ========================================================= */
-
+/* STATUS */
 let statusTimeout = null;
 
 function showStatus(message, color = '#89ddff', autoHideMs = 0) {
@@ -1045,9 +1078,7 @@ function showStatus(message, color = '#89ddff', autoHideMs = 0) {
     genStatus.textContent = message;
 
     if (autoHideMs > 0) {
-        statusTimeout = setTimeout(() => {
-            hideStatus();
-        }, autoHideMs);
+        statusTimeout = setTimeout(() => hideStatus(), autoHideMs);
     }
 }
 
@@ -1090,10 +1121,7 @@ function typeWriterEffect(text, htmlAppend = '', color = '#89ddff', callback) {
     typing();
 }
 
-/* =========================================================
-   TABS
-   ========================================================= */
-
+/* TABS */
 function switchTab(tabName) {
     document.querySelectorAll('.tab-btn').forEach(button => {
         button.classList.toggle(
@@ -1125,10 +1153,7 @@ function switchTab(tabName) {
     }
 }
 
-/* =========================================================
-   PASSWORD VISIBILITY
-   ========================================================= */
-
+/* PASSWORD VISIBILITY */
 $('togglePasswordBtn').addEventListener('click', () => {
     const input = $('loginPassword');
     const button = $('togglePasswordBtn');
@@ -1139,10 +1164,7 @@ $('togglePasswordBtn').addEventListener('click', () => {
     button.textContent = visible ? 'show password' : 'hide password';
 });
 
-/* =========================================================
-   DASHBOARD RENDER
-   ========================================================= */
-
+/* DASHBOARD RENDER */
 function renderDashboard() {
     if (!currentUser) {
         $('noAuthNotice').style.display = 'block';
@@ -1169,10 +1191,7 @@ function renderDashboard() {
     $('sessionStatus').style.color = '#84ce22';
 }
 
-/* =========================================================
-   LOAD CURRENT USER
-   ========================================================= */
-
+/* LOAD CURRENT USER */
 async function loadCurrentUser() {
     try {
         const result = await apiRequest('/api/me');
@@ -1184,10 +1203,7 @@ async function loadCurrentUser() {
     renderDashboard();
 }
 
-/* =========================================================
-   DASHBOARD REFRESH
-   ========================================================= */
-
+/* DASHBOARD REFRESH */
 async function refreshDashboard(showMessage = true) {
     if (!currentUser || dashboardLoading) return;
 
@@ -1234,10 +1250,7 @@ $('refreshDashboardBtn').addEventListener('click', () => {
     refreshDashboard(true);
 });
 
-/* =========================================================
-   COPY USERNAME
-   ========================================================= */
-
+/* COPY USERNAME */
 $('copyUsernameBtn').addEventListener('click', async () => {
     if (!currentUser?.username) {
         showStatus('no username available.', '#e06c75');
@@ -1252,10 +1265,7 @@ $('copyUsernameBtn').addEventListener('click', async () => {
     }
 });
 
-/* =========================================================
-   REGISTRATION
-   ========================================================= */
-
+/* REGISTRATION */
 registerForm.addEventListener('submit', async event => {
     event.preventDefault();
 
@@ -1326,10 +1336,7 @@ registerForm.addEventListener('submit', async event => {
     }
 });
 
-/* =========================================================
-   EMAIL VERIFICATION
-   ========================================================= */
-
+/* EMAIL VERIFICATION */
 verifyEmailForm.addEventListener('submit', async event => {
     event.preventDefault();
 
@@ -1374,10 +1381,7 @@ verifyEmailForm.addEventListener('submit', async event => {
     }
 });
 
-/* =========================================================
-   RESEND EMAIL CODE
-   ========================================================= */
-
+/* RESEND EMAIL CODE */
 $('resendEmailCodeBtn').addEventListener('click', async () => {
     const button = $('resendEmailCodeBtn');
 
@@ -1403,10 +1407,7 @@ $('resendEmailCodeBtn').addEventListener('click', async () => {
     }
 });
 
-/* =========================================================
-   RESTART REGISTRATION
-   ========================================================= */
-
+/* RESTART REGISTRATION */
 $('restartRegisterBtn').addEventListener('click', () => {
     pendingVerificationId = null;
 
@@ -1419,10 +1420,7 @@ $('restartRegisterBtn').addEventListener('click', () => {
     showStatus('registration restarted.', '#89ddff');
 });
 
-/* =========================================================
-   INVITE GENERATOR
-   ========================================================= */
-
+/* INVITE GENERATOR */
 inviteForm.addEventListener('submit', async event => {
     event.preventDefault();
 
@@ -1513,10 +1511,7 @@ inviteForm.addEventListener('submit', async event => {
     }
 });
 
-/* =========================================================
-   INVITE KEY CHECKER
-   ========================================================= */
-
+/* INVITE KEY CHECKER */
 checkForm.addEventListener('submit', async event => {
     event.preventDefault();
 
@@ -1560,10 +1555,7 @@ checkForm.addEventListener('submit', async event => {
     }
 });
 
-/* =========================================================
-   PUBLIC SERVER CONFIGURATION
-   ========================================================= */
-
+/* PUBLIC SERVER CONFIGURATION */
 async function loadServerLinks() {
     try {
         const config = await apiRequest('/api/public-config');
@@ -1611,10 +1603,7 @@ async function loadServerLinks() {
     }
 }
 
-/* =========================================================
-   BETA APPLICATION STATUS
-   ========================================================= */
-
+/* BETA APPLICATION STATUS */
 async function loadBetaApplicationStatus() {
     const status = $('betaApplyStatus');
 
@@ -1670,10 +1659,7 @@ async function loadBetaApplicationStatus() {
     }
 }
 
-/* =========================================================
-   APPLY FOR BETA
-   ========================================================= */
-
+/* APPLY FOR BETA */
 $('betaApplyBtn').addEventListener('click', async () => {
     const button = $('betaApplyBtn');
     const status = $('betaApplyStatus');
@@ -1706,10 +1692,7 @@ $('betaApplyBtn').addEventListener('click', async () => {
     }
 });
 
-/* =========================================================
-   LOGIN
-   ========================================================= */
-
+/* LOGIN */
 loginForm.addEventListener('submit', async event => {
     event.preventDefault();
 
@@ -1750,10 +1733,7 @@ loginForm.addEventListener('submit', async event => {
     }
 });
 
-/* =========================================================
-   LOGOUT
-   ========================================================= */
-
+/* LOGOUT */
 $('logoutBtn').addEventListener('click', async () => {
     const button = $('logoutBtn');
 
@@ -1780,10 +1760,7 @@ $('logoutBtn').addEventListener('click', async () => {
     }
 });
 
-/* =========================================================
-   DISCORD SERVER MONITOR
-   ========================================================= */
-
+/* DISCORD SERVER MONITOR */
 function formatDiscordDate(timestamp) {
     const date = new Date(timestamp);
 
@@ -1905,10 +1882,7 @@ async function loadDiscordEvents() {
 
 $('refreshDiscordEvents').addEventListener('click', loadDiscordEvents);
 
-/* =========================================================
-   ADMIN COMMANDS
-   ========================================================= */
-
+/* ADMIN COMMANDS */
 window.genInvite = async function () {
     const password = window.prompt('Wataszit admin password:');
 
@@ -2019,10 +1993,7 @@ window.NOEMAILVERIFY = async function () {
 
 window.noemailverify = window.NOEMAILVERIFY;
 
-/* =========================================================
-   INITIALIZATION
-   ========================================================= */
-
+/* INITIALIZATION */
 console.info(
     '[Wataszit] Admin commands ready: genInvite(), NOINVITEREG(), NOEMAILVERIFY().'
 );
