@@ -123,8 +123,21 @@ body {
     line-height: 1.15;
 }
 
+/* RGB ANIMATION - SZIT */
 #brdtitle h1 .title-green {
-    color: #84ce22;
+    background: linear-gradient(90deg,
+        #597ecf 0%,
+        #49b0aa 18%,
+        #5ca868 36%,
+        #bfa754 54%,
+        #b86256 72%,
+        #9d5eb3 88%,
+        #597ecf 100%);
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rainbowFlow 4s linear infinite;
 }
 
 .menu-subtitle {
@@ -958,18 +971,41 @@ async function apiRequest(endpoint, options = {}) {
    STATUS
    ========================================================= */
 
-function showStatus(message, color = '#89ddff') {
+let statusTimeout = null;
+
+function showStatus(message, color = '#89ddff', autoHideMs = 0) {
+    if (statusTimeout) {
+        clearTimeout(statusTimeout);
+        statusTimeout = null;
+    }
+
     genStatus.classList.add('active');
     genStatus.style.color = color;
     genStatus.textContent = message;
+
+    if (autoHideMs > 0) {
+        statusTimeout = setTimeout(() => {
+            hideStatus();
+        }, autoHideMs);
+    }
 }
 
 function hideStatus() {
+    if (statusTimeout) {
+        clearTimeout(statusTimeout);
+        statusTimeout = null;
+    }
+
     genStatus.classList.remove('active');
     genStatus.textContent = '';
 }
 
 function typeWriterEffect(text, htmlAppend = '', color = '#89ddff', callback) {
+    if (statusTimeout) {
+        clearTimeout(statusTimeout);
+        statusTimeout = null;
+    }
+
     genStatus.classList.add('active');
     genStatus.style.color = color;
     genStatus.textContent = '';
@@ -1659,7 +1695,8 @@ loginForm.addEventListener('submit', async event => {
         renderDashboard();
         switchTab('dashboard');
 
-        showStatus('login successful.', '#84ce22');
+        // Login success message disappears after 3 seconds.
+        showStatus('login successful.', '#84ce22', 3000);
 
     } catch (error) {
         showStatus('[error] ' + error.message, '#e06c75');
