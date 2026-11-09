@@ -1483,9 +1483,15 @@ inviteForm.addEventListener('submit', async event => {
                             copy.addEventListener('click', async () => {
                                 try {
                                     await navigator.clipboard.writeText(inviteCode);
-                                    copy.textContent = 'copied!';
+
+                                    // Hide the entire generated invite UI immediately.
+                                    hideStatus();
+
                                 } catch {
-                                    showStatus('could not copy invite code.', '#e06c75');
+                                    showStatus(
+                                        'could not copy invite code.',
+                                        '#e06c75'
+                                    );
                                 }
                             });
 
@@ -1510,7 +1516,6 @@ inviteForm.addEventListener('submit', async event => {
         $('generateBtn').disabled = false;
     }
 });
-
 /* INVITE KEY CHECKER */
 checkForm.addEventListener('submit', async event => {
     event.preventDefault();
